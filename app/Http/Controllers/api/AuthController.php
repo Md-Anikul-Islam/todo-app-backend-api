@@ -24,7 +24,7 @@ class AuthController extends Controller
                 'errors' => $validate->errors()
             ],422);
         }
-        $reqData = request()->only('name','email','password');
+        $reqData = request()->only('name','phone','email','password');
         $reqData['password'] = Hash::make($request->password);
         $user = User::create($reqData);
         Auth::login($user);
@@ -62,11 +62,13 @@ class AuthController extends Controller
     }
 
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::user()->token()->revoke();
+        // Correct Sanctum way to logout
+        $request->user()->currentAccessToken()->delete();
+
         return response()->json([
-            'message' => 'User Logout Successfully'
-        ],200);
+            'message' => 'User logged out successfully'
+        ], 200);
     }
 }
